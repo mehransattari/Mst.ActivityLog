@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>MST.ActivityLog</PackageId>
+    <Authors>Mehran Sattari</Authors>
+    <Company>MST</Company>
+    <Product>Mst.ActivityLog</Product>
+    <Copyright>2024</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://mehransattary.ir/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mehransattari/Mst.ActivityLog</RepositoryUrl>
+    <Description>Mehran Sattari Framework</Description>
+    <PackageTags>Activity Log</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
+    <PackageIcon>Mst.png</PackageIcon>
+    <PackageIconUrl />
+    <PackageReleaseNotes>Activity Log </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Mst.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  
+</Project>
