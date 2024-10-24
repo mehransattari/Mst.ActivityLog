@@ -18,7 +18,7 @@ builder.Services.AddActivityLogging(settings =>
                              
 
 
-### Add file nlog.config
+### Add IActivityLogDbContext To ApplicationDbContext
 ```
 public class ApplicationDbContext : DbContext, IActivityLogDbContext
 {   
@@ -35,7 +35,7 @@ public class ApplicationDbContext : DbContext, IActivityLogDbContext
 ```
 
 
-###How use controller
+###How Use Controller
 
 ```
 [Route("api/[controller]")]
