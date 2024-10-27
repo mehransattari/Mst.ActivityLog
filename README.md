@@ -1,6 +1,6 @@
 ### Install package
 
-`Install-Package MST.ActivityLog -Version 1.0.0`
+`Install-Package MST.ActivityLog -Version 1.0.1`
 
 ### Program.cs
 ```
