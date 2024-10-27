@@ -24,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="MST.Nlog" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,7 +15,6 @@ public class ActivityLogFilter : IActionFilter
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        // فقط در صورتیکه عملیات POST یا DELETE باشد، لاگ را ثبت کن
         var httpMethod = context.HttpContext.Request.Method;
         if (httpMethod == HttpMethods.Post || httpMethod == HttpMethods.Delete)
         {
@@ -31,14 +30,12 @@ public class ActivityLogFilter : IActionFilter
                 ActionName = context.ActionDescriptor.RouteValues["action"]
             };
 
-            // عملیات لاگ‌گذاری به‌صورت غیرهمزمان
             _activityLogger.LogAsync(activityLog).GetAwaiter().GetResult();
         }
     }
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
-        // فقط در صورتیکه عملیات POST یا DELETE باشد، لاگ را ثبت کن  
         var httpMethod = context.HttpContext.Request.Method;
         if (httpMethod == HttpMethods.Post || httpMethod == HttpMethods.Delete)
         {
@@ -56,7 +53,6 @@ public class ActivityLogFilter : IActionFilter
                     : "Operation succeeded"
             };
 
-            // عملیات لاگ‌گذاری به‌صورت غیرهمزمان  
             _activityLogger.LogAsync(activityLog).GetAwaiter().GetResult();
         }
     }
