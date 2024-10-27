@@ -38,6 +38,26 @@ public class ActivityLogFilter : IActionFilter
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
-        // هیچ عملیاتی در اینجا انجام نمی‌شود
+        // فقط در صورتیکه عملیات POST یا DELETE باشد، لاگ را ثبت کن  
+        var httpMethod = context.HttpContext.Request.Method;
+        if (httpMethod == HttpMethods.Post || httpMethod == HttpMethods.Delete)
+        {
+            var activityLog = new ActivityLog
+            {
+                UserId = context.HttpContext.User.Identity.Name ?? "No User",
+                ActionType = httpMethod,
+                Date = DateTime.UtcNow,
+                IpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString(),
+                UserAgent = context.HttpContext.Request.Headers["User-Agent"],
+                ControllerName = context.ActionDescriptor.RouteValues["controller"],
+                ActionName = context.ActionDescriptor.RouteValues["action"],
+                Description = context.Exception != null
+                    ? $"Operation failed due to: {context.Exception.Message}"
+                    : "Operation succeeded"
+            };
+
+            // عملیات لاگ‌گذاری به‌صورت غیرهمزمان  
+            _activityLogger.LogAsync(activityLog).GetAwaiter().GetResult();
+        }
     }
 }
