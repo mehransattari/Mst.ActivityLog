@@ -38,6 +38,10 @@ public class ApplicationDbContext : DbContext, IActivityLogDbContext
 ###How Use Controller
 
 ```
+[ServiceFilter(typeof(ActivityLogFilter))]
+```
+
+```
 [Route("api/[controller]")]
 [ApiController]
 public class LogEntriesController : ControllerBase
