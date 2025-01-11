@@ -1,6 +1,6 @@
 ### Install package
 
-`Install-Package MST.ActivityLog -Version 1.0.0`
+`Install-Package MST.ActivityLog -Version 1.0.1`
 
 ### Program.cs
 ```
@@ -36,6 +36,10 @@ public class ApplicationDbContext : DbContext, IActivityLogDbContext
 
 
 ###How Use Controller
+
+```
+[ServiceFilter(typeof(ActivityLogFilter))]
+```
 
 ```
 [Route("api/[controller]")]
