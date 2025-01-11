@@ -8,9 +8,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddActivityLogging(this IServiceCollection services, Action<ActivityLogSettings> configureSettings)
     {
-        var settings = new ActivityLogSettings();
-        configureSettings(settings);
-        services.AddSingleton(settings);
+        var activityLogSettings = new ActivityLogSettings();
+        configureSettings(activityLogSettings);
+        services.AddSingleton(activityLogSettings);
 
         services.AddScoped<IActivityLogger, ActivityLogger>();
         services.AddScoped<ActivityLogFilter>();
@@ -21,7 +21,26 @@ public static class DependencyInjection
 public class ActivityLogSettings
 {
     public List<HttpMethodType> HttpMethods { get; set; } = new List<HttpMethodType>();
+
+    public HttpMethodType ConvertToStandardHttpMethods(string httpMethod)
+    {
+        switch (httpMethod.ToLower())
+        {
+            case "get":
+                return HttpMethodType.Get;
+            case "post":
+                return HttpMethodType.Post;
+            case "put":
+                return HttpMethodType.Put;
+            case "delete":
+                return HttpMethodType.Delete;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(httpMethod), httpMethod, null);
+        }
+    }
+
 }
+
 
 
 public enum HttpMethodType

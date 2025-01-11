@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Mst.ActivityLog.Services;
 
 namespace Mst.ActivityLog.Filters;
@@ -7,22 +6,44 @@ namespace Mst.ActivityLog.Filters;
 public class ActivityLogFilter : IActionFilter
 {
     private readonly IActivityLogger _activityLogger;
-
-    public ActivityLogFilter(IActivityLogger activityLogger)
+    private readonly ActivityLogSettings _activityLogSettings;
+    public ActivityLogFilter(IActivityLogger activityLogger, ActivityLogSettings activityLogSettings)
     {
         _activityLogger = activityLogger;
+        _activityLogSettings = activityLogSettings; 
     }
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        var httpMethod = context.HttpContext.Request.Method;
-        if (httpMethod == HttpMethods.Post || httpMethod == HttpMethods.Delete)
-        {
+        if (!context.HttpContext.User.Identity.IsAuthenticated)
+            return;
+
+        var httpMethod = _activityLogSettings.ConvertToStandardHttpMethods(context.HttpContext.Request.Method);
+
+        var mobile = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type.Contains("mobilephone"))?.Value ?? "No User";
+        var userId = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type.Contains("nameidentifier"))?.Value ?? "No User";
+
+        string description = string.Empty;
+
+        if (httpMethod == HttpMethodType.Post)
+            description = "Adding new item";
+
+        if (httpMethod == HttpMethodType.Put)
+            description = "Puting new item";
+
+        if (httpMethod == HttpMethodType.Delete)
+            description = "Deleting new item";
+
+        if (httpMethod == HttpMethodType.Get)
+            description = "Geting new item";
+
+        if (_activityLogSettings.HttpMethods.Contains(httpMethod))
+        {          
             var activityLog = new ActivityLog
             {
-                UserId = context.HttpContext.User.Identity.Name ?? "No User"    ,
-                ActionType = httpMethod,
-                Description = httpMethod == HttpMethods.Post ? "Adding new item" : "Deleting an item",
+                UserId = userId,
+                ActionType = httpMethod.ToString(),
+                Description = description + " | Mobile: " + mobile ,
                 Date = DateTime.UtcNow,
                 IpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString(),
                 UserAgent = context.HttpContext.Request.Headers["User-Agent"],
@@ -36,21 +57,28 @@ public class ActivityLogFilter : IActionFilter
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
-        var httpMethod = context.HttpContext.Request.Method;
-        if (httpMethod == HttpMethods.Post || httpMethod == HttpMethods.Delete)
+        if (!context.HttpContext.User.Identity.IsAuthenticated)
+            return;
+
+        var httpMethod = _activityLogSettings.ConvertToStandardHttpMethods(context.HttpContext.Request.Method);
+        var mobile = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type.Contains("mobilephone"))?.Value ?? "No User";
+        var userId = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type.Contains("nameidentifier"))?.Value ?? "No User";
+
+        if (_activityLogSettings.HttpMethods.Contains(httpMethod))
         {
+
             var activityLog = new ActivityLog
             {
-                UserId = context.HttpContext.User.Identity.Name ?? "No User",
-                ActionType = httpMethod,
+                UserId = userId,
+                ActionType = httpMethod.ToString(),
                 Date = DateTime.UtcNow,
                 IpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString(),
                 UserAgent = context.HttpContext.Request.Headers["User-Agent"],
                 ControllerName = context.ActionDescriptor.RouteValues["controller"],
                 ActionName = context.ActionDescriptor.RouteValues["action"],
                 Description = context.Exception != null
-                    ? $"Operation failed due to: {context.Exception.Message}"
-                    : "Operation succeeded"
+                              ? $"Operation failed due to: {context.Exception.Message}"
+                              : "Operation succeeded | Mobile: " + mobile
             };
 
             _activityLogger.LogAsync(activityLog).GetAwaiter().GetResult();
